@@ -11,10 +11,24 @@ const router = trpc.router
 const publicProcedure = trpc.procedure
 
 const appRouter = router({
-  hello: publicProcedure.query(() => 'hello world dev')
+  hello: publicProcedure.query(() => 'hello world....'),
+  products: publicProcedure.query(() => {
+    return [
+      {
+        id: 1,
+        name: 'product 1',
+        description: 'description 1'
+      },
+      {
+        id: 2,
+        name: 'product 2',
+        description: 'description 2'
+      }
+    ]
+  })
 })
 
-// export type AppRouter = typeof appRouter
+export type AppRouter = typeof appRouter
 
 app.use(cors())
 app.use(

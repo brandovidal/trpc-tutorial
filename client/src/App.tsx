@@ -27,10 +27,51 @@ function App (): JSX.Element {
 }
 
 function AppContent (): JSX.Element {
-  const helloMessage = trpc.products.useQuery()
-  console.log('🚀 ~ file: App.tsx:31 ~ AppContent ~ helloMessage', helloMessage)
+  const [newProduct, setNewProduct] = useState('')
 
-  return <div>{JSON.stringify(helloMessage.data)}</div>
+  const getProducts = trpc.products.useQuery()
+  const createProduct = trpc.createProduct.useMutation()
+
+  const client = trpc.useContext()
+
+  if (getProducts.isLoading) {
+    return <h1>Loading...</h1>
+  }
+
+  const handleSubmit = (e: any): void => {
+    e.preventDefault()
+    createProduct.mutate(
+      { name: newProduct },
+      {
+        onSuccess () {
+          void client.products.invalidate()
+        }
+      }
+    )
+  }
+
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input
+          type='text'
+          value={newProduct}
+          onChange={e => setNewProduct(e.target.value)}
+        />
+        <button>save</button>
+      </form>
+
+      <ul>
+        {getProducts.data?.map((product, index) => (
+          <li key={index}>
+            <p>ID: {product.id}</p>
+            <p>{product.name}</p>
+            <p>{product.description}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
 }
 
 export default App
